@@ -1,28 +1,99 @@
-const products=[
-{id:1,n:"Wireless Earbuds Pro",c:"Electronics",p:1290,o:1590,i:"🎧"},{id:2,n:"Smart Watch Series 8",c:"Electronics",p:1890,o:2290,i:"⌚"},
-{id:3,n:"Premium Cotton T-Shirt",c:"Fashion",p:650,o:850,i:"👕"},{id:4,n:"Travel Backpack",c:"Accessories",p:990,o:1290,i:"🎒"},
-{id:5,n:"Modern Table Lamp",c:"Home",p:790,o:990,i:"💡"},{id:6,n:"Daily Face Care Set",c:"Beauty",p:850,o:1100,i:"🧴"},
-{id:7,n:"Portable Bluetooth Speaker",c:"Electronics",p:1490,o:1790,i:"🔊"},{id:8,n:"Casual Sneakers",c:"Fashion",p:1750,o:2100,i:"👟"},
-{id:9,n:"Kitchen Storage Set",c:"Home",p:590,o:750,i:"🍱"},{id:10,n:"Sunglasses",c:"Accessories",p:490,o:690,i:"🕶️"},
-{id:11,n:"Hair Styling Kit",c:"Beauty",p:1190,o:1450,i:"💇"},{id:12,n:"Mini Power Bank",c:"Electronics",p:990,o:1250,i:"🔋"}];
-let cart=JSON.parse(localStorage.getItem("szcart")||"[]"),cat="All";
-const money=n=>"৳"+n.toLocaleString("en-BD");
-function render(){let q=document.getElementById("search").value.toLowerCase(),s=document.getElementById("sort").value;
-let a=products.filter(x=>(cat==="All"||x.c===cat)&&(x.n+" "+x.c).toLowerCase().includes(q));
-if(s==="low")a.sort((x,y)=>x.p-y.p);if(s==="high")a.sort((x,y)=>y.p-x.p);
-document.getElementById("grid").innerHTML=a.map(x=>`<article class="card"><div class="pic">${x.i}</div><div class="body"><div class="tag">${x.c}</div><h3>${x.n}</h3><span class="price">${money(x.p)}</span><span class="old">${money(x.o)}</span><button class="add" onclick="add(${x.id})">Add to Cart</button></div></article>`).join("");
-document.getElementById("none").hidden=!!a.length}
-function save(){localStorage.setItem("szcart",JSON.stringify(cart))}
-function add(id){let p=products.find(x=>x.id===id),x=cart.find(x=>x.id===id);x?x.q++:cart.push({...p,q:1});save();renderCart();openCart()}
-function renderCart(){let qty=cart.reduce((a,x)=>a+x.q,0),sum=cart.reduce((a,x)=>a+x.p*x.q,0);document.getElementById("count").textContent=qty;document.getElementById("total").textContent=money(sum);document.getElementById("checkoutTotal").textContent=money(sum);
-document.getElementById("items").innerHTML=cart.length?cart.map(x=>`<div class="cartitem"><div class="thumb">${x.i}</div><div><h4>${x.n}</h4><small>${money(x.p)}</small><div class="qty"><button onclick="change(${x.id},-1)">−</button><b>${x.q}</b><button onclick="change(${x.id},1)">+</button></div></div><button class="remove" onclick="removeItem(${x.id})">Remove</button></div>`).join(""):'<div class="empty">🛒<br><br>Your cart is empty.</div>'}
-function change(id,n){let x=cart.find(x=>x.id===id);if(!x)return;x.q+=n;if(x.q<1)cart=cart.filter(x=>x.id!==id);save();renderCart()}
-function removeItem(id){cart=cart.filter(x=>x.id!==id);save();renderCart()}
-function openCart(){document.getElementById("cart").classList.add("open");document.getElementById("shade").classList.add("show")}
-function closeCart(){document.getElementById("cart").classList.remove("open");document.getElementById("shade").classList.remove("show")}
-function checkout(){if(!cart.length){alert("Your cart is empty.");return}document.getElementById("modal").classList.add("show");document.getElementById("form").hidden=false;document.getElementById("success").hidden=true}
-function closeCheckout(){document.getElementById("modal").classList.remove("show")}
-document.getElementById("search").oninput=render;
-document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));b.classList.add("active");cat=b.dataset.cat;render()});
-document.getElementById("form").onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(e.target));let order={id:"SZ"+Date.now(),customer:d,items:cart,total:cart.reduce((a,x)=>a+x.p*x.q,0)};localStorage.setItem("sz_last_order",JSON.stringify(order));cart=[];save();renderCart();e.target.hidden=true;document.getElementById("success").hidden=false};
-render();renderCart();
+const products = [
+ {id:1,name:"Smart Watch",cat:"Electronics",price:59.99,old:89.99,rating:4.8,badge:"Hot",img:"https://images.unsplash.com/photo-1544117519-31a4b719223d?auto=format&fit=crop&w=700&q=80"},
+ {id:2,name:"Wireless Headphones",cat:"Electronics",price:49.99,old:79.99,rating:4.7,badge:"New",img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80"},
+ {id:3,name:"Running Shoes",cat:"Fashion",price:69.99,old:99.99,rating:4.6,badge:"Sale",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80"},
+ {id:4,name:"Smartphone 128GB",cat:"Electronics",price:699,old:799,rating:4.9,badge:"",img:"https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=700&q=80"},
+ {id:5,name:"Laptop Backpack",cat:"Fashion",price:39.99,old:59.99,rating:4.6,badge:"",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80"},
+ {id:6,name:"Bluetooth Speaker",cat:"Electronics",price:29.99,old:49.99,rating:4.6,badge:"Popular",img:"https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=700&q=80"},
+ {id:7,name:"Coffee Maker",cat:"Home & Living",price:84.99,old:109.99,rating:4.5,badge:"",img:"https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?auto=format&fit=crop&w=700&q=80"},
+ {id:8,name:"Sports Backpack",cat:"Sports & Outdoor",price:44.99,old:64.99,rating:4.4,badge:"New",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80"},
+ {id:9,name:"Gaming Controller",cat:"Toys & Games",price:54.99,old:69.99,rating:4.7,badge:"",img:"https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?auto=format&fit=crop&w=700&q=80"},
+ {id:10,name:"Desk Lamp",cat:"Home & Living",price:24.99,old:34.99,rating:4.5,badge:"",img:"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=700&q=80"},
+ {id:11,name:"Perfume Gift Set",cat:"Beauty & Health",price:42.99,old:55.99,rating:4.8,badge:"Sale",img:"https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=700&q=80"},
+ {id:12,name:"Casual T-Shirt",cat:"Fashion",price:19.99,old:29.99,rating:4.5,badge:"Hot",img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80"}
+];
+
+let cart = JSON.parse(localStorage.getItem("shopezone-cart") || "[]");
+let wishlist = JSON.parse(localStorage.getItem("shopezone-wishlist") || "[]");
+let currentProducts = products;
+
+const grid = document.getElementById("productGrid");
+const empty = document.getElementById("emptyState");
+const cartDrawer = document.getElementById("cartDrawer");
+const overlay = document.getElementById("overlay");
+
+function money(n){return "$"+Number(n).toFixed(2)}
+function renderProducts(list=currentProducts){
+  currentProducts=list;
+  grid.innerHTML=list.map(p=>`
+    <article class="product">
+      <div class="product-img"><img loading="lazy" src="${p.img}" alt="${p.name}">${p.badge?`<span class="badge">${p.badge}</span>`:""}</div>
+      <div class="product-body">
+        <h3 title="${p.name}">${p.name}</h3>
+        <div><span class="price">${money(p.price)}</span><span class="old">${money(p.old)}</span></div>
+        <div class="rating">★★★★★ <span>(${p.rating})</span></div>
+        <button class="add" onclick="addToCart(${p.id})">🛒 Add to Cart</button>
+      </div>
+    </article>`).join("");
+  empty.hidden=list.length!==0;
+}
+function save(){localStorage.setItem("shopezone-cart",JSON.stringify(cart));localStorage.setItem("shopezone-wishlist",JSON.stringify(wishlist));updateCounts()}
+function updateCounts(){
+  document.getElementById("cartCount").textContent=cart.reduce((a,x)=>a+x.qty,0);
+  document.getElementById("wishCount").textContent=wishlist.length;
+  document.getElementById("subtotal").textContent=money(cart.reduce((a,x)=>a+x.price*x.qty,0));
+}
+function addToCart(id){
+  const p=products.find(x=>x.id===id), item=cart.find(x=>x.id===id);
+  if(item)item.qty++; else cart.push({...p,qty:1});
+  save(); renderCart(); openCart();
+}
+function changeQty(id,delta){
+  const item=cart.find(x=>x.id===id); if(!item)return;
+  item.qty+=delta; if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
+  save(); renderCart();
+}
+function renderCart(){
+  const box=document.getElementById("cartItems");
+  if(!cart.length){box.innerHTML='<div class="empty">Your cart is empty.<br>Add some products to continue.</div>';return}
+  box.innerHTML=cart.map(x=>`
+    <div class="cart-row">
+      <img src="${x.img}" alt="${x.name}">
+      <div><h4>${x.name}</h4><p>${money(x.price)}</p><div class="qty"><button onclick="changeQty(${x.id},-1)">−</button><span>${x.qty}</span><button onclick="changeQty(${x.id},1)">+</button></div></div>
+      <button class="modal-close" style="position:static;font-size:22px" onclick="changeQty(${x.id},-999)">×</button>
+    </div>`).join("");
+}
+function openCart(){cartDrawer.classList.add("open");overlay.classList.add("show")}
+function closeCart(){cartDrawer.classList.remove("open");overlay.classList.remove("show")}
+document.getElementById("cartBtn").onclick=openCart;
+document.getElementById("closeCart").onclick=closeCart;
+overlay.onclick=closeCart;
+
+document.getElementById("searchBtn").onclick=search;
+document.getElementById("searchInput").addEventListener("input",search);
+function search(){
+  const q=document.getElementById("searchInput").value.toLowerCase().trim();
+  renderProducts(products.filter(p=>(p.name+" "+p.cat).toLowerCase().includes(q)));
+}
+document.querySelectorAll(".categories button").forEach(btn=>btn.addEventListener("click",()=>{
+  const cat=btn.dataset.cat;
+  document.getElementById("shop").scrollIntoView({behavior:"smooth"});
+  renderProducts(cat==="All"?products:products.filter(p=>p.cat===cat));
+}));
+document.getElementById("viewAll").onclick=()=>renderProducts(products);
+
+const modal=document.getElementById("checkoutModal");
+document.getElementById("checkoutBtn").onclick=()=>{
+  if(!cart.length){alert("Your cart is empty.");return}
+  modal.classList.add("show");
+};
+document.getElementById("closeModal").onclick=()=>modal.classList.remove("show");
+document.getElementById("orderForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  document.getElementById("orderForm").hidden=true;
+  document.getElementById("orderSuccess").hidden=false;
+  cart=[];save();renderCart();
+});
+renderProducts(products);
+renderCart();
+updateCounts();

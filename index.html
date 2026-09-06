@@ -1,76 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="description" content="ShopeZone - Smart online shopping">
-<title>ShopeZone — Online Shopping</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b7cff" />
+  <title>ShopeZone — Quality Products • Better Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div class="top">🚚 Free delivery on selected orders <span>Need help? +880 1XXXXXXXXX</span></div>
+  <div class="topbar">🚚 Free delivery on selected orders &nbsp; • &nbsp; Secure shopping &nbsp; • &nbsp; Easy returns</div>
 
-<header>
-  <div class="nav container">
-    <a class="logo" href="#"><i>Shop</i>eZone</a>
-    <div class="search"><input id="search" placeholder="Search products, brands and more..."><button onclick="render()">🔍</button></div>
-    <button class="navlink">♡ <small>Wishlist</small></button>
-    <button class="cart" onclick="openCart()">🛒 <span>Cart</span><b id="count">0</b></button>
+  <header class="header">
+    <a class="brand" href="#">
+      <span class="brand-mark">🛒</span>
+      <span><b>Shope<span>Zone</span></b><small>Quality Products • Better Life</small></span>
+    </a>
+
+    <nav class="nav">
+      <a class="active" href="#home">Home</a>
+      <a href="#shop">Shop</a>
+      <a href="#categories">Categories</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="search">
+        <input id="searchInput" type="search" placeholder="Search for products..." aria-label="Search products">
+        <button id="searchBtn" aria-label="Search">⌕</button>
+      </div>
+      <button class="icon-btn" title="Account">♙<span class="hide-mobile">Login / Register</span></button>
+      <button class="icon-btn heart" title="Wishlist">♡<i id="wishCount">0</i></button>
+      <button class="icon-btn cart" id="cartBtn" title="Cart">🛒<i id="cartCount">0</i></button>
+    </div>
+  </header>
+
+  <main id="home">
+    <section class="hero-wrap">
+      <aside class="categories" id="categories">
+        <div class="cat-title">☰ &nbsp; All Categories</div>
+        <button data-cat="Electronics">📱 <span>Electronics</span><b>›</b></button>
+        <button data-cat="Fashion">👕 <span>Fashion</span><b>›</b></button>
+        <button data-cat="Home & Living">🏠 <span>Home & Living</span><b>›</b></button>
+        <button data-cat="Beauty & Health">🌿 <span>Beauty & Health</span><b>›</b></button>
+        <button data-cat="Sports & Outdoor">⚽ <span>Sports & Outdoor</span><b>›</b></button>
+        <button data-cat="Toys & Games">🎮 <span>Toys & Games</span><b>›</b></button>
+        <button data-cat="Books & Stationery">📚 <span>Books & Stationery</span><b>›</b></button>
+        <button data-cat="Automotive">🚗 <span>Automotive</span><b>›</b></button>
+        <button data-cat="All">▦ <span>More Categories</span><b>›</b></button>
+      </aside>
+
+      <div class="hero" id="hero">
+        <img src="wide_clean_modern_e_commerce_website_homepage_ui.png" alt="ShopeZone shopping promotion">
+        <div class="hero-overlay">
+          <p>BEST DEALS, EVERY DAY</p>
+          <h1>Upgrade Your<br><strong>Lifestyle</strong></h1>
+          <span>Discover quality products at great prices.<br>Shop smarter. Live better.</span>
+          <a href="#shop" class="primary-btn">Shop Now →</a>
+        </div>
+        <div class="hero-dots"><b></b><i></i><i></i></div>
+      </div>
+    </section>
+
+    <section class="services">
+      <div>🚚 <span><b>Free Shipping</b><small>On selected orders</small></span></div>
+      <div>🛡️ <span><b>Secure Payment</b><small>Safe & trusted checkout</small></span></div>
+      <div>🎧 <span><b>24/7 Support</b><small>We're here to help</small></span></div>
+      <div>📦 <span><b>Easy Returns</b><small>Simple return policy</small></span></div>
+    </section>
+
+    <section class="section" id="shop">
+      <div class="section-head">
+        <div>
+          <h2>Featured Products</h2>
+          <p>Hand-picked products for everyday life</p>
+        </div>
+        <button class="view-all" id="viewAll">View All →</button>
+      </div>
+      <div class="products" id="productGrid"></div>
+      <div class="empty" id="emptyState" hidden>No products found. Try another search.</div>
+    </section>
+
+    <section class="promo">
+      <div><small>SHOPEZONE SPECIAL</small><h2>Shop more. Save more.</h2><p>New deals are added regularly.</p></div>
+      <a href="#shop" class="primary-btn">Explore Deals →</a>
+    </section>
+
+    <section class="about section" id="about">
+      <div>
+        <span class="eyebrow">ABOUT SHOPEZONE</span>
+        <h2>Quality products.<br>Better shopping.</h2>
+        <p>ShopeZone is a modern online shopping destination focused on useful, quality products, clear pricing and a simple customer experience.</p>
+      </div>
+      <div class="about-cards">
+        <div><b>✓</b><strong>Trusted Products</strong><span>Carefully selected items</span></div>
+        <div><b>✓</b><strong>Simple Ordering</strong><span>Fast and easy checkout</span></div>
+        <div><b>✓</b><strong>Customer First</strong><span>Support when you need it</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <div class="footer-main">
+      <div><div class="footer-brand">Shope<span>Zone</span></div><p>Quality Products • Better Life</p></div>
+      <div><h4>Quick Links</h4><a href="#home">Home</a><a href="#shop">Shop</a><a href="#about">About</a></div>
+      <div><h4>Customer Service</h4><a href="#">Shipping Policy</a><a href="#">Return Policy</a><a href="#">Privacy Policy</a></div>
+      <div><h4>Contact</h4><p>📞 +880 1XXXXXXXXX</p><p>✉️ support@shopezone.com</p><p>📍 Bangladesh</p></div>
+    </div>
+    <div class="copyright">© 2026 ShopeZone. All rights reserved.</div>
+  </footer>
+
+  <div class="overlay" id="overlay"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="drawer-head"><h3>Your Cart</h3><button id="closeCart">×</button></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-footer">
+      <div><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+      <button class="checkout" id="checkoutBtn">Checkout / Order</button>
+      <small>Cash on Delivery available</small>
+    </div>
+  </aside>
+
+  <div class="modal" id="checkoutModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeModal">×</button>
+      <h2>Complete Your Order</h2>
+      <p class="muted">Enter your delivery information.</p>
+      <form id="orderForm">
+        <input required name="name" placeholder="Full name">
+        <input required name="phone" placeholder="Phone number">
+        <textarea required name="address" placeholder="Full delivery address"></textarea>
+        <select name="payment"><option>Cash on Delivery</option><option>Online Payment</option></select>
+        <button class="checkout" type="submit">Place Order</button>
+      </form>
+      <div id="orderSuccess" class="success" hidden>✅ Order request received! We will contact you to confirm.</div>
+    </div>
   </div>
-  <div class="menu"><div class="container">
-    <a href="#products">Categories</a><a href="#products">New Arrivals</a><a href="#products">Best Sellers</a><a href="#products">Flash Sale 🔥</a><a href="#products">All Products</a>
-  </div></div>
-</header>
 
-<section class="hero">
- <div class="container hero-grid">
-  <div><label>WELCOME TO SHOPEZONE</label><h1>Everything you need.<br><strong>One easy place.</strong></h1><p>Discover quality products, great prices and convenient Cash on Delivery.</p><a href="#products" class="btn">Shop Now →</a></div>
-  <div class="hero-art"><div>🛍️</div><strong>UP TO 30% OFF</strong><span>Selected products</span></div>
- </div>
-</section>
-
-<section class="container categories">
- <h2>Shop by Category</h2>
- <div class="cats">
-  <button class="cat active" data-cat="All">✨ All</button><button class="cat" data-cat="Electronics">📱 Electronics</button>
-  <button class="cat" data-cat="Fashion">👕 Fashion</button><button class="cat" data-cat="Home">🏠 Home</button>
-  <button class="cat" data-cat="Beauty">✨ Beauty</button><button class="cat" data-cat="Accessories">🎒 Accessories</button>
- </div>
-</section>
-
-<main id="products" class="container">
- <div class="heading"><div><label>TOP PICKS</label><h2>Popular Products</h2></div>
- <select id="sort" onchange="render()"><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select></div>
- <div id="grid" class="grid"></div><div id="none" class="none" hidden>No products found.</div>
-</main>
-
-<section class="benefits"><div class="container benefits-grid">
- <div>🚚<b>Fast Delivery</b><small>Reliable delivery service</small></div>
- <div>🔒<b>Secure Shopping</b><small>Safe and simple ordering</small></div>
- <div>💵<b>Cash on Delivery</b><small>Pay when you receive</small></div>
- <div>💬<b>Customer Support</b><small>We're here to help</small></div>
-</div></section>
-
-<footer><div class="container foot">
- <div><a class="logo white" href="#"><i>Shop</i>eZone</a><p>Your trusted online shopping destination.</p></div>
- <div><h4>Shop</h4><a href="#products">All Products</a><a href="#products">Categories</a></div>
- <div><h4>Customer Care</h4><a href="#">Delivery Info</a><a href="#">Contact Us</a></div>
-</div><div class="copy">© 2026 ShopeZone. All rights reserved.</div></footer>
-
-<div id="shade" class="shade" onclick="closeCart()"></div>
-<aside id="cart" class="cartpanel"><div class="panelhead"><h2>Shopping Cart</h2><button onclick="closeCart()">×</button></div><div id="items" class="items"></div><div class="cartbottom"><div><span>Total</span><strong id="total">৳0</strong></div><button class="btn full" onclick="checkout()">Checkout</button></div></aside>
-
-<div id="modal" class="modal"><div class="modalbox">
- <div class="panelhead"><h2>Complete Your Order</h2><button onclick="closeCheckout()">×</button></div>
- <form id="form">
-  <label>Full Name<input name="name" required placeholder="Enter your name"></label>
-  <label>Phone Number<input name="phone" required placeholder="01XXXXXXXXX" inputmode="tel"></label>
-  <label>Delivery Address<textarea name="address" required placeholder="House, road, area, city"></textarea></label>
-  <label>Payment Method<select name="payment"><option>Cash on Delivery</option></select></label>
-  <div class="summary"><span>Order Total</span><b id="checkoutTotal">৳0</b></div>
-  <button class="btn full">Place Order</button>
- </form>
- <div id="success" class="success" hidden><div>✓</div><h3>Order placed!</h3><p>Thank you for shopping with ShopeZone. We will contact you to confirm your order.</p><button class="btn" onclick="closeCheckout()">Continue Shopping</button></div>
-</div></div>
-<script src="script.js"></script>
-</body></html>
+  <script src="script.js"></script>
+</body>
+</html>
