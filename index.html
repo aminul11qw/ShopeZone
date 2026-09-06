@@ -32,7 +32,7 @@
         <input id="searchInput" type="search" placeholder="Search for products..." aria-label="Search products">
         <button id="searchBtn" aria-label="Search">⌕</button>
       </div>
-      <button class="icon-btn" title="Account">♙<span class="hide-mobile">Login / Register</span></button>
+      <button class="icon-btn" id="accountBtn" title="Account">♙<span class="hide-mobile">Login / Register</span></button>
       <button class="icon-btn heart" title="Wishlist">♡<i id="wishCount">0</i></button>
       <button class="icon-btn cart" id="cartBtn" title="Cart">🛒<i id="cartCount">0</i></button>
     </div>
@@ -113,6 +113,42 @@
     <div class="copyright">© 2026 ShopeZone. All rights reserved.</div>
   </footer>
 
+
+  <div class="auth-modal" id="authModal">
+    <div class="auth-box">
+      <button class="auth-close" id="authClose">×</button>
+      <div class="auth-logo">Shope<span>Zone</span></div>
+      <h2>Login / Register</h2>
+      <p class="muted">Use your mobile number or email address.</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth="phone">📱 Mobile OTP</button>
+        <button class="auth-tab" data-auth="email">✉️ Email</button>
+      </div>
+      <div id="phoneAuth">
+        <input id="phoneNumber" type="tel" placeholder="+8801XXXXXXXXX" autocomplete="tel">
+        <div id="recaptcha-container"></div>
+        <button class="checkout" id="sendOtp">Send Verification Code</button>
+        <div id="otpArea" hidden>
+          <input id="otpCode" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit verification code">
+          <button class="checkout" id="verifyOtp">Verify & Login</button>
+        </div>
+        <p class="auth-note">Example: +8801712345678</p>
+      </div>
+      <div id="emailAuth" hidden>
+        <input id="emailAddress" type="email" placeholder="Email address" autocomplete="email">
+        <input id="emailPassword" type="password" placeholder="Password (minimum 6 characters)">
+        <button class="checkout" id="emailRegister">Create Account & Verify Email</button>
+        <button class="secondary-btn" id="emailLogin">Login with Email</button>
+        <p class="auth-note">A verification link will be sent to your email after registration.</p>
+      </div>
+      <div id="authMessage" class="auth-message" hidden></div>
+      <div id="userPanel" hidden>
+        <div class="user-card"><strong id="userName"></strong><span id="userEmail"></span></div>
+        <button class="secondary-btn" id="logoutBtn">Log out</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay" id="overlay"></div>
   <aside class="cart-drawer" id="cartDrawer">
     <div class="drawer-head"><h3>Your Cart</h3><button id="closeCart">×</button></div>
@@ -140,6 +176,6 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
