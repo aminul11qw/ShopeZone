@@ -118,9 +118,9 @@
     <div class="auth-box">
       <button class="auth-close" id="authClose">×</button>
       <div class="auth-logo">Shope<span>Zone</span></div>
-      <h2>Login / Register</h2>
+      <h2 id="authTitle">Login</h2>
       <p class="muted">Use your mobile number or email address.</p>
-      <div class="auth-tabs">
+      <div class="mode-toggle"><button class="mode-btn active" id="loginMode">Login</button><button class="mode-btn" id="signupMode">Sign Up</button></div><div class="auth-tabs">
         <button class="auth-tab active" data-auth="phone">📱 Mobile OTP</button>
         <button class="auth-tab" data-auth="email">✉️ Email</button>
       </div>
@@ -149,6 +149,22 @@
     </div>
   </div>
 
+
+  <div class="modal" id="profileModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeProfile">×</button>
+      <h2>Customer Details</h2>
+      <p class="muted">Save your details once. Future orders will use them automatically.</p>
+      <form id="profileForm">
+        <input required id="profileName" placeholder="Full name" autocomplete="name">
+        <input required id="profilePhone" type="tel" placeholder="Phone number" autocomplete="tel">
+        <input id="profileBilling" placeholder="Billing code (auto-generated if empty)">
+        <textarea required id="profileAddress" placeholder="Full delivery address" autocomplete="street-address"></textarea>
+        <button class="checkout" type="submit">Save My Details</button>
+      </form>
+    </div>
+  </div>
+
   <div class="overlay" id="overlay"></div>
   <aside class="cart-drawer" id="cartDrawer">
     <div class="drawer-head"><h3>Your Cart</h3><button id="closeCart">×</button></div>
@@ -164,7 +180,8 @@
     <div class="modal-box">
       <button class="modal-close" id="closeModal">×</button>
       <h2>Complete Your Order</h2>
-      <p class="muted">Enter your delivery information.</p>
+      <p class="muted" id="checkoutHint">Your saved customer details will be used for this order.</p>
+      <div id="savedCustomerBox" class="saved-customer" hidden></div>
       <form id="orderForm">
         <input required name="name" placeholder="Full name">
         <input required name="phone" placeholder="Phone number">
