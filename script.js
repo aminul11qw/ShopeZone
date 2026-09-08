@@ -22,7 +22,12 @@ const empty = document.getElementById("emptyState");
 const cartDrawer = document.getElementById("cartDrawer");
 const overlay = document.getElementById("overlay");
 
-function money(n){return "$"+Number(n).toFixed(2)}
+function money(n){
+  const digits="০১২৩৪৫৬৭৮৯";
+  const num=Number(n).toFixed(2);
+  const bn=num.replace(/[0-9]/g,d=>digits[d]);
+  return "৳"+bn;
+}
 function renderProducts(list=currentProducts){
   currentProducts=list;
   grid.innerHTML=list.map(p=>`
@@ -88,82 +93,11 @@ document.getElementById("checkoutBtn").onclick=()=>{
   modal.classList.add("show");
 };
 document.getElementById("closeModal").onclick=()=>modal.classList.remove("show");
-/* ================================
-   ShopeZone - EmailJS Order Email
-   ================================ */
-const EMAILJS_SERVICE_ID = "service_b12wcbq";
-const EMAILJS_TEMPLATE_ID = "template_2ifmljr";
-const EMAILJS_PUBLIC_KEY = "7p85t0kub-iS_jMnD";
-
-function loadEmailJS(){
-  return new Promise((resolve,reject)=>{
-    if(window.emailjs){ resolve(); return; }
-    const existing=document.querySelector('script[data-emailjs="shopezone"]');
-    if(existing){
-      existing.addEventListener("load",()=>resolve(),{once:true});
-      existing.addEventListener("error",()=>reject(new Error("EmailJS library could not be loaded.")),{once:true});
-      return;
-    }
-    const s=document.createElement("script");
-    s.src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
-    s.async=true;
-    s.dataset.emailjs="shopezone";
-    s.onload=()=>resolve();
-    s.onerror=()=>reject(new Error("EmailJS library could not be loaded. Check your internet connection."));
-    document.head.appendChild(s);
-  });
-}
-
-async function sendOrderEmail(){
-  await loadEmailJS();
-  emailjs.init({publicKey: EMAILJS_PUBLIC_KEY});
-
-  const form=document.getElementById("orderForm");
-  const getValue=(name)=>{
-    const el=form.elements[name] || document.getElementById(name);
-    return el ? String(el.value || "").trim() : "";
-  };
-
-  const orderId="SZ-"+Date.now().toString(36).toUpperCase();
-  const orderDetails=cart.map((item,index)=>
-    `${index+1}. ${item.name} — Qty: ${item.qty} — ${money(item.price*item.qty)}`
-  ).join("\n");
-  const total=cart.reduce((sum,item)=>sum+item.price*item.qty,0);
-
-  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    order_id: orderId,
-    customer_name: getValue("name"),
-    customer_phone: getValue("phone"),
-    customer_address: getValue("address"),
-    payment_method: getValue("payment") || getValue("payment_method"),
-    order_details: orderDetails,
-    total: money(total),
-    order_time: new Date().toLocaleString("en-BD",{timeZone:"Asia/Dhaka"})
-  });
-}
-
-document.getElementById("orderForm").addEventListener("submit",async e=>{
+document.getElementById("orderForm").addEventListener("submit",e=>{
   e.preventDefault();
-
-  if(!cart.length){
-    alert("Your cart is empty.");
-    return;
-  }
-
-  const btn=e.submitter;
-  if(btn) btn.disabled=true;
-
-  try{
-    await sendOrderEmail();
-    document.getElementById("orderForm").hidden=true;
-    document.getElementById("orderSuccess").hidden=false;
-    cart=[]; save(); renderCart();
-  }catch(error){
-    console.error("ShopeZone EmailJS error:",error);
-    alert("Order email could not be sent.\n\nEmailJS: "+(error?.text || error?.message || "Unknown error")+"\n\nYour order was NOT cleared. Please try again.");
-  }finally{
-    if(btn) btn.disabled=false;
-  }
+  document.getElementById("orderForm").hidden=true;
+  document.getElementById("orderSuccess").hidden=false;
+  cart=[];save();renderCart();
 });
 renderProducts(products);
 renderCart();
