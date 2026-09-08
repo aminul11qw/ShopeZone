@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b7cff" />
+  <title>ShopeZone — Quality Products • Better Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="topbar">🚚 Free delivery on selected orders &nbsp; • &nbsp; Secure shopping &nbsp; • &nbsp; Easy returns</div>
+
+  <header class="header">
+    <a class="brand" href="#">
+      <span class="brand-mark">🛒</span>
+      <span><b>Shope<span>Zone</span></b><small>Quality Products • Better Life</small></span>
+    </a>
+
+    <nav class="nav">
+      <a class="active" href="#home">Home</a>
+      <a href="#shop">Shop</a>
+      <a href="#categories">Categories</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="search">
+        <input id="searchInput" type="search" placeholder="Search for products..." aria-label="Search products">
+        <button id="searchBtn" aria-label="Search">⌕</button>
+      </div>
+      <button class="icon-btn" id="accountBtn" title="Account">♙<span class="hide-mobile">Login / Register</span></button>
+      <button class="icon-btn heart" title="Wishlist">♡<i id="wishCount">0</i></button>
+      <button class="icon-btn cart" id="cartBtn" title="Cart">🛒<i id="cartCount">0</i></button>
+    </div>
+  </header>
+
+  <main id="home">
+    <section class="hero-wrap">
+      <aside class="categories" id="categories">
+        <div class="cat-title">☰ &nbsp; All Categories</div>
+        <button data-cat="Electronics">📱 <span>Electronics</span><b>›</b></button>
+        <button data-cat="Fashion">👕 <span>Fashion</span><b>›</b></button>
+        <button data-cat="Home & Living">🏠 <span>Home & Living</span><b>›</b></button>
+        <button data-cat="Beauty & Health">🌿 <span>Beauty & Health</span><b>›</b></button>
+        <button data-cat="Sports & Outdoor">⚽ <span>Sports & Outdoor</span><b>›</b></button>
+        <button data-cat="Toys & Games">🎮 <span>Toys & Games</span><b>›</b></button>
+        <button data-cat="Books & Stationery">📚 <span>Books & Stationery</span><b>›</b></button>
+        <button data-cat="Automotive">🚗 <span>Automotive</span><b>›</b></button>
+        <button data-cat="All">▦ <span>More Categories</span><b>›</b></button>
+      </aside>
+
+      <div class="hero" id="hero">
+        <img src="wide_clean_modern_e_commerce_website_homepage_ui.png" alt="ShopeZone shopping promotion">
+        <div class="hero-overlay">
+          <p>BEST DEALS, EVERY DAY</p>
+          <h1>Upgrade Your<br><strong>Lifestyle</strong></h1>
+          <span>Discover quality products at great prices.<br>Shop smarter. Live better.</span>
+          <a href="#shop" class="primary-btn">Shop Now →</a>
+        </div>
+        <div class="hero-dots"><b></b><i></i><i></i></div>
+      </div>
+    </section>
+
+    <section class="services">
+      <div>🚚 <span><b>Free Shipping</b><small>On selected orders</small></span></div>
+      <div>🛡️ <span><b>Secure Payment</b><small>Safe & trusted checkout</small></span></div>
+      <div>🎧 <span><b>24/7 Support</b><small>We're here to help</small></span></div>
+      <div>📦 <span><b>Easy Returns</b><small>Simple return policy</small></span></div>
+    </section>
+
+    <section class="section" id="shop">
+      <div class="section-head">
+        <div>
+          <h2>Featured Products</h2>
+          <p>Hand-picked products for everyday life</p>
+        </div>
+        <button class="view-all" id="viewAll">View All →</button>
+      </div>
+      <div class="products" id="productGrid"></div>
+      <div class="empty" id="emptyState" hidden>No products found. Try another search.</div>
+    </section>
+
+    <section class="promo">
+      <div><small>SHOPEZONE SPECIAL</small><h2>Shop more. Save more.</h2><p>New deals are added regularly.</p></div>
+      <a href="#shop" class="primary-btn">Explore Deals →</a>
+    </section>
+
+    <section class="about section" id="about">
+      <div>
+        <span class="eyebrow">ABOUT SHOPEZONE</span>
+        <h2>Quality products.<br>Better shopping.</h2>
+        <p>ShopeZone is a modern online shopping destination focused on useful, quality products, clear pricing and a simple customer experience.</p>
+      </div>
+      <div class="about-cards">
+        <div><b>✓</b><strong>Trusted Products</strong><span>Carefully selected items</span></div>
+        <div><b>✓</b><strong>Simple Ordering</strong><span>Fast and easy checkout</span></div>
+        <div><b>✓</b><strong>Customer First</strong><span>Support when you need it</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <div class="footer-main">
+      <div><div class="footer-brand">Shope<span>Zone</span></div><p>Quality Products • Better Life</p></div>
+      <div><h4>Quick Links</h4><a href="#home">Home</a><a href="#shop">Shop</a><a href="#about">About</a></div>
+      <div><h4>Customer Service</h4><a href="#">Shipping Policy</a><a href="#">Return Policy</a><a href="#">Privacy Policy</a></div>
+      <div><h4>Contact</h4><p>📞 +880 1XXXXXXXXX</p><p>✉️ support@shopezone.com</p><p>📍 Bangladesh</p></div>
+    </div>
+    <div class="copyright">© 2026 ShopeZone. All rights reserved.</div>
+  </footer>
+
+
+  <div class="auth-modal" id="authModal">
+    <div class="auth-box">
+      <button class="auth-close" id="authClose">×</button>
+      <div class="auth-logo">Shope<span>Zone</span></div>
+      <h2 id="authTitle">Login</h2>
+      <p class="muted">Use your mobile number or email address.</p>
+      <div class="mode-toggle"><button class="mode-btn active" id="loginMode">Login</button><button class="mode-btn" id="signupMode">Sign Up</button></div><div class="auth-tabs">
+        <button class="auth-tab active" data-auth="phone">📱 Mobile OTP</button>
+        <button class="auth-tab" data-auth="email">✉️ Email</button>
+      </div>
+      <div id="phoneAuth">
+        <input id="phoneNumber" type="tel" placeholder="+8801XXXXXXXXX" autocomplete="tel">
+        <div id="recaptcha-container"></div>
+        <button class="checkout" id="sendOtp">Send Verification Code</button>
+        <div id="otpArea" hidden>
+          <input id="otpCode" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit verification code">
+          <button class="checkout" id="verifyOtp">Verify & Login</button>
+        </div>
+        <p class="auth-note">Example: +8801712345678</p>
+      </div>
+      <div id="emailAuth" hidden>
+        <input id="emailAddress" type="email" placeholder="Email address" autocomplete="email">
+        <input id="emailPassword" type="password" placeholder="Password (minimum 6 characters)">
+        <button class="checkout" id="emailRegister">Create Account & Verify Email</button>
+        <button class="secondary-btn" id="emailLogin">Login with Email</button>
+        <p class="auth-note">A verification link will be sent to your email after registration.</p>
+      </div>
+      <div id="authMessage" class="auth-message" hidden></div>
+      <div id="userPanel" hidden>
+        <div class="user-card"><strong id="userName"></strong><span id="userEmail"></span></div>
+        <button class="secondary-btn" id="logoutBtn">Log out</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="profileModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeProfile">×</button>
+      <h2>Customer Details</h2>
+      <p class="muted">Save your details once. Future orders will use them automatically.</p>
+      <form id="profileForm">
+        <input required id="profileName" placeholder="Full name" autocomplete="name">
+        <input required id="profilePhone" type="tel" placeholder="Phone number" autocomplete="tel">
+        <input id="profileBilling" placeholder="Billing code (auto-generated if empty)">
+        <textarea required id="profileAddress" placeholder="Full delivery address" autocomplete="street-address"></textarea>
+        <button class="checkout" type="submit">Save My Details</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="drawer-head"><h3>Your Cart</h3><button id="closeCart">×</button></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-footer">
+      <div><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+      <button class="checkout" id="checkoutBtn">Checkout / Order</button>
+      <small>Cash on Delivery available</small>
+    </div>
+  </aside>
+
+  <div class="modal" id="checkoutModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeModal">×</button>
+      <h2>Complete Your Order</h2>
+      <p class="muted" id="checkoutHint">Your saved customer details will be used for this order.</p>
+      <div id="savedCustomerBox" class="saved-customer" hidden></div>
+      <form id="orderForm">
+        <input required name="name" placeholder="Full name">
+        <input required name="phone" placeholder="Phone number">
+        <textarea required name="address" placeholder="Full delivery address"></textarea>
+        <select name="payment"><option>Cash on Delivery</option><option>Online Payment</option></select>
+        <button class="checkout" type="submit">Place Order</button>
+      </form>
+      <div id="orderSuccess" class="success" hidden>✅ Order request received! We will contact you to confirm.</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
