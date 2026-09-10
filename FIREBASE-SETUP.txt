@@ -1,0 +1,20 @@
+ShopeZone Firebase Login Setup
+
+Firebase project: shopezone-4c666
+
+Already added to the website:
+- Mobile number login with Firebase SMS OTP + reCAPTCHA
+- Email/password registration
+- Email verification link after registration
+- Email login blocked until email is verified
+- Login/logout state shown in the account popup
+
+Firebase Console:
+Authentication -> Sign-in providers:
+- Phone: enabled
+- Email/Password: enabled
+
+Before Phone OTP works on the live website, add your website's live domain under:
+Authentication -> Settings -> Authorized domains
+
+Important: Email verification is a link, not a 6-digit email OTP.

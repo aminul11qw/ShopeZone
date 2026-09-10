@@ -1,3 +1,134 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBgugRnMKEOcXLsR2mrJgWbHPapYzUq4c4",
+  authDomain: "shopezone-4c666.firebaseapp.com",
+  projectId: "shopezone-4c666",
+  storageBucket: "shopezone-4c666.firebasestorage.app",
+  messagingSenderId: "1049798447788",
+  appId: "1:1049798447788:web:f6499203d62ea8df728509"
+};
+
+const auth = getAuth(initializeApp(firebaseConfig));
+let confirmationResult = null;
+let recaptchaVerifier = null;
+const authModal=document.getElementById("authModal");
+const authMessage=document.getElementById("authMessage");
+function authMsg(text,error=false){authMessage.hidden=false;authMessage.textContent=text;authMessage.classList.toggle("error",error)}
+
+let authMode="login";
+const authTitle=document.getElementById("authTitle"),authHint=document.getElementById("authHint"),loginMode=document.getElementById("loginMode"),signupMode=document.getElementById("signupMode");
+function setAuthMode(mode){authMode=mode;loginMode.classList.toggle("active",mode==="login");signupMode.classList.toggle("active",mode==="signup");authTitle.textContent=mode==="login"?"Login":"Sign Up";authHint.textContent=mode==="login"?"Login with your mobile number or email.":"Create your ShopeZone customer account.";document.getElementById("emailRegister").hidden=mode==="login";document.getElementById("emailLogin").hidden=mode==="signup";document.getElementById("sendOtp").textContent=mode==="login"?"Send Verification Code":"Send Sign Up Code";document.getElementById("otpArea").hidden=true;}
+loginMode.onclick=()=>setAuthMode("login");signupMode.onclick=()=>setAuthMode("signup");
+document.getElementById("accountBtn").onclick=()=>authModal.classList.add("show");
+document.getElementById("authClose").onclick=()=>authModal.classList.remove("show");
+
+document.querySelectorAll(".auth-tab").forEach(tab=>tab.addEventListener("click",()=>{
+  document.querySelectorAll(".auth-tab").forEach(x=>x.classList.remove("active"));
+  tab.classList.add("active");
+  const phone=tab.dataset.auth==="phone";
+  document.getElementById("phoneAuth").hidden=!phone;
+  document.getElementById("emailAuth").hidden=phone;
+  authMessage.hidden=true;
+}));
+
+document.getElementById("sendOtp").onclick=async()=>{
+  const phone=document.getElementById("phoneNumber").value.trim();
+  if(!/^\+\d{8,15}$/.test(phone)){authMsg("Use international format, e.g. +8801712345678.",true);return;}
+  try{
+    if(!recaptchaVerifier){recaptchaVerifier=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"});}
+    confirmationResult=await signInWithPhoneNumber(auth,phone,recaptchaVerifier);
+    document.getElementById("otpArea").hidden=false;
+    authMsg("Verification code sent by SMS.");
+  }catch(e){
+    console.error(e); authMsg(e.message||"Could not send the verification code.",true);
+    if(recaptchaVerifier){try{recaptchaVerifier.clear()}catch(_){}} recaptchaVerifier=null;
+  }
+};
+
+document.getElementById("verifyOtp").onclick=async()=>{
+  const code=document.getElementById("otpCode").value.trim();
+  if(!confirmationResult){authMsg("Please request a verification code first.",true);return;}
+  if(!/^\d{6}$/.test(code)){authMsg("Enter the 6-digit verification code.",true);return;}
+  try{await confirmationResult.confirm(code);authMsg("Phone verified. You are now logged in.");}
+  catch(e){authMsg("Invalid or expired verification code.",true);}
+};
+
+document.getElementById("emailRegister").onclick=async()=>{
+  const email=document.getElementById("emailAddress").value.trim();
+  const password=document.getElementById("emailPassword").value;
+  if(!email||password.length<6){authMsg("Enter an email and a password of at least 6 characters.",true);return;}
+  try{const cred=await createUserWithEmailAndPassword(auth,email,password);await sendEmailVerification(cred.user);authMsg("Account created. Check your email and click the verification link.");}
+  catch(e){authMsg(e.message||"Could not create the account.",true);}
+};
+
+document.getElementById("emailLogin").onclick=async()=>{
+  const email=document.getElementById("emailAddress").value.trim();
+  const password=document.getElementById("emailPassword").value;
+  try{
+    const cred=await signInWithEmailAndPassword(auth,email,password);
+    if(!cred.user.emailVerified){await sendEmailVerification(cred.user);authMsg("Please verify your email first. A new verification link was sent.");return;}
+    authMsg("Email verified. You are now logged in.");
+  }catch(e){authMsg(e.message||"Email login failed.",true);}
+};
+
+
+const profileModal=document.getElementById("profileModal");
+const profileForm=document.getElementById("profileForm");
+const checkoutForm=document.getElementById("orderForm");
+const savedCustomerBox=document.getElementById("savedCustomerBox");
+const profileKey=user=>`shopezone-profile-${user.uid}`;
+function getProfile(user){try{return JSON.parse(localStorage.getItem(profileKey(user))||"null")}catch(e){return null}}
+function openProfile(user){
+  if(!user)return;
+  const p=getProfile(user);
+  document.getElementById("profileName").value=p?.name||"";
+  document.getElementById("profilePhone").value=p?.phone||user.phoneNumber||"";
+  document.getElementById("profileBilling").value=p?.billingCode||`SZ-${user.uid.slice(-8).toUpperCase()}`;
+  document.getElementById("profileAddress").value=p?.address||"";
+  profileModal.classList.add("show");
+}
+function saveProfile(user,data){localStorage.setItem(profileKey(user),JSON.stringify(data))}
+function fillCheckout(user){
+  const p=getProfile(user);
+  if(!p)return false;
+  checkoutForm.name.value=p.name;
+  checkoutForm.phone.value=p.phone;
+  checkoutForm.address.value=p.address;
+  savedCustomerBox.innerHTML=`<strong>✓ Saved Customer Details</strong><span>👤 ${p.name}</span><span>📱 ${p.phone}</span><span>🧾 Billing Code: ${p.billingCode}</span><span>📍 ${p.address}</span><button type="button" class="profile-edit" id="editProfile">Edit details</button>`;
+  savedCustomerBox.hidden=false;
+  checkoutForm.name.hidden=true; checkoutForm.phone.hidden=true; checkoutForm.address.hidden=true;
+  document.getElementById("editProfile").onclick=()=>openProfile(user);
+  return true;
+}
+profileForm.addEventListener("submit",e=>{
+  e.preventDefault();
+  const user=auth.currentUser;if(!user)return;
+  const data={name:document.getElementById("profileName").value.trim(),phone:document.getElementById("profilePhone").value.trim(),billingCode:document.getElementById("profileBilling").value.trim()||`SZ-${user.uid.slice(-8).toUpperCase()}`,address:document.getElementById("profileAddress").value.trim()};
+  if(!data.name||!data.phone||!data.address)return;
+  saveProfile(user,data); profileModal.classList.remove("show");
+  fillCheckout(user);
+});
+document.getElementById("closeProfile").onclick=()=>profileModal.classList.remove("show");
+
+document.getElementById("logoutBtn").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,user=>{
+  const panel=document.getElementById("userPanel");
+  panel.hidden=!user;
+  if(user){
+    document.getElementById("userName").textContent=user.displayName||"ShopeZone Customer";
+    document.getElementById("userEmail").textContent=user.email||user.phoneNumber||"";
+    document.querySelector(".auth-tabs").hidden=true;
+    document.getElementById("phoneAuth").hidden=true;
+    document.getElementById("emailAuth").hidden=true;
+  }else{
+    document.querySelector(".auth-tabs").hidden=false;
+    document.getElementById("phoneAuth").hidden=false;
+    document.getElementById("emailAuth").hidden=true;
+  }
+});
+
 const products = [
  {id:1,name:"Smart Watch",cat:"Electronics",price:59.99,old:89.99,rating:4.8,badge:"Hot",img:"https://images.unsplash.com/photo-1544117519-31a4b719223d?auto=format&fit=crop&w=700&q=80"},
  {id:2,name:"Wireless Headphones",cat:"Electronics",price:49.99,old:79.99,rating:4.7,badge:"New",img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80"},
@@ -43,12 +174,12 @@ function updateCounts(){
   document.getElementById("wishCount").textContent=wishlist.length;
   document.getElementById("subtotal").textContent=money(cart.reduce((a,x)=>a+x.price*x.qty,0));
 }
-function addToCart(id){
+window.addToCart = function addToCart(id){
   const p=products.find(x=>x.id===id), item=cart.find(x=>x.id===id);
   if(item)item.qty++; else cart.push({...p,qty:1});
   save(); renderCart(); openCart();
 }
-function changeQty(id,delta){
+window.changeQty = function changeQty(id,delta){
   const item=cart.find(x=>x.id===id); if(!item)return;
   item.qty+=delta; if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
   save(); renderCart();
@@ -85,85 +216,18 @@ document.getElementById("viewAll").onclick=()=>renderProducts(products);
 const modal=document.getElementById("checkoutModal");
 document.getElementById("checkoutBtn").onclick=()=>{
   if(!cart.length){alert("Your cart is empty.");return}
+  const user=auth.currentUser;
+  if(!user){alert("Please Login / Sign Up first. Your saved customer details will then be used automatically.");document.getElementById("authModal").classList.add("show");return}
+  if(!getProfile(user)){openProfile(user);return}
   modal.classList.add("show");
+  fillCheckout(user);
 };
-document.getElementById("closeModal").onclick=()=>modal.classList.remove("show");
-/* ================================
-   ShopeZone - EmailJS Order Email
-   ================================ */
-const EMAILJS_SERVICE_ID = "service_b12wcbq";
-const EMAILJS_TEMPLATE_ID = "template_2ifmljr";
-const EMAILJS_PUBLIC_KEY = "7p85t0kub-iS_jMnD";
-
-function loadEmailJS(){
-  return new Promise((resolve,reject)=>{
-    if(window.emailjs){ resolve(); return; }
-    const existing=document.querySelector('script[data-emailjs="shopezone"]');
-    if(existing){
-      existing.addEventListener("load",()=>resolve(),{once:true});
-      existing.addEventListener("error",()=>reject(new Error("EmailJS library could not be loaded.")),{once:true});
-      return;
-    }
-    const s=document.createElement("script");
-    s.src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
-    s.async=true;
-    s.dataset.emailjs="shopezone";
-    s.onload=()=>resolve();
-    s.onerror=()=>reject(new Error("EmailJS library could not be loaded. Check your internet connection."));
-    document.head.appendChild(s);
-  });
-}
-
-async function sendOrderEmail(){
-  await loadEmailJS();
-  emailjs.init({publicKey: EMAILJS_PUBLIC_KEY});
-
-  const form=document.getElementById("orderForm");
-  const getValue=(name)=>{
-    const el=form.elements[name] || document.getElementById(name);
-    return el ? String(el.value || "").trim() : "";
-  };
-
-  const orderId="SZ-"+Date.now().toString(36).toUpperCase();
-  const orderDetails=cart.map((item,index)=>
-    `${index+1}. ${item.name} — Qty: ${item.qty} — ${money(item.price*item.qty)}`
-  ).join("\n");
-  const total=cart.reduce((sum,item)=>sum+item.price*item.qty,0);
-
-  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    order_id: orderId,
-    customer_name: getValue("name"),
-    customer_phone: getValue("phone"),
-    customer_address: getValue("address"),
-    payment_method: getValue("payment") || getValue("payment_method"),
-    order_details: orderDetails,
-    total: money(total),
-    order_time: new Date().toLocaleString("en-BD",{timeZone:"Asia/Dhaka"})
-  });
-}
-
-document.getElementById("orderForm").addEventListener("submit",async e=>{
+document.getElementById("closeModal").onclick=()=>{modal.classList.remove("show");};
+document.getElementById("orderForm").addEventListener("submit",e=>{
   e.preventDefault();
-
-  if(!cart.length){
-    alert("Your cart is empty.");
-    return;
-  }
-
-  const btn=e.submitter;
-  if(btn) btn.disabled=true;
-
-  try{
-    await sendOrderEmail();
-    document.getElementById("orderForm").hidden=true;
-    document.getElementById("orderSuccess").hidden=false;
-    cart=[]; save(); renderCart();
-  }catch(error){
-    console.error("ShopeZone EmailJS error:",error);
-    alert("Order email could not be sent.\n\nEmailJS: "+(error?.text || error?.message || "Unknown error")+"\n\nYour order was NOT cleared. Please try again.");
-  }finally{
-    if(btn) btn.disabled=false;
-  }
+  document.getElementById("orderForm").hidden=true;
+  document.getElementById("orderSuccess").hidden=false;
+  cart=[];save();renderCart();
 });
 renderProducts(products);
 renderCart();
