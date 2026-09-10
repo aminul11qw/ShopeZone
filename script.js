@@ -18,7 +18,7 @@ const authMessage=document.getElementById("authMessage");
 function authMsg(text,error=false){authMessage.hidden=false;authMessage.textContent=text;authMessage.classList.toggle("error",error)}
 
 let authMode="login";
-const authTitle=document.getElementById("authTitle"),authHint=document.getElementById("authHint"),loginMode=document.getElementById("loginMode"),signupMode=document.getElementById("signupMode");
+const authTitle=document.getElementById("authTitle"),authHint=document.querySelector("#authTitle + .muted"),loginMode=document.getElementById("loginMode"),signupMode=document.getElementById("signupMode");
 function setAuthMode(mode){authMode=mode;loginMode.classList.toggle("active",mode==="login");signupMode.classList.toggle("active",mode==="signup");authTitle.textContent=mode==="login"?"Login":"Sign Up";authHint.textContent=mode==="login"?"Login with your mobile number or email.":"Create your ShopeZone customer account.";document.getElementById("emailRegister").hidden=mode==="login";document.getElementById("emailLogin").hidden=mode==="signup";document.getElementById("sendOtp").textContent=mode==="login"?"Send Verification Code":"Send Sign Up Code";document.getElementById("otpArea").hidden=true;}
 loginMode.onclick=()=>setAuthMode("login");signupMode.onclick=()=>setAuthMode("signup");
 document.getElementById("accountBtn").onclick=()=>authModal.classList.add("show");
@@ -225,6 +225,27 @@ document.getElementById("checkoutBtn").onclick=()=>{
 document.getElementById("closeModal").onclick=()=>{modal.classList.remove("show");};
 document.getElementById("orderForm").addEventListener("submit",e=>{
   e.preventDefault();
+  const user=auth.currentUser;
+  if(!user){alert("Please login first.");return}
+  const data=new FormData(checkoutForm);
+  const p=getProfile(user);
+  const order={
+    orderId:"SZ-"+Date.now().toString().slice(-8),
+    customerId:user.uid,
+    name:data.get("name")||p?.name||"",
+    phone:data.get("phone")||p?.phone||user.phoneNumber||"",
+    billingCode:p?.billingCode||"",
+    address:data.get("address")||p?.address||"",
+    payment:data.get("payment")||"Cash on Delivery",
+    items:cart.map(x=>({id:x.id,name:x.name,price:x.price,qty:x.qty})),
+    total:cart.reduce((a,x)=>a+x.price*x.qty,0),
+    status:"Pending",
+    createdAt:new Date().toISOString()
+  };
+  localStorage.setItem("shopezone-last-order",JSON.stringify(order));
+  const orders=JSON.parse(localStorage.getItem("shopezone-orders")||"[]");
+  orders.unshift(order);
+  localStorage.setItem("shopezone-orders",JSON.stringify(orders));
   document.getElementById("orderForm").hidden=true;
   document.getElementById("orderSuccess").hidden=false;
   cart=[];save();renderCart();
