@@ -17,6 +17,10 @@ const authModal=document.getElementById("authModal");
 const authMessage=document.getElementById("authMessage");
 function authMsg(text,error=false){authMessage.hidden=false;authMessage.textContent=text;authMessage.classList.toggle("error",error)}
 
+let authMode="login";
+const authTitle=document.getElementById("authTitle"),authHint=document.getElementById("authHint"),loginMode=document.getElementById("loginMode"),signupMode=document.getElementById("signupMode");
+function setAuthMode(mode){authMode=mode;loginMode.classList.toggle("active",mode==="login");signupMode.classList.toggle("active",mode==="signup");authTitle.textContent=mode==="login"?"Login":"Sign Up";authHint.textContent=mode==="login"?"Login with your mobile number or email.":"Create your ShopeZone customer account.";document.getElementById("emailRegister").hidden=mode==="login";document.getElementById("emailLogin").hidden=mode==="signup";document.getElementById("sendOtp").textContent=mode==="login"?"Send Verification Code":"Send Sign Up Code";document.getElementById("otpArea").hidden=true;}
+loginMode.onclick=()=>setAuthMode("login");signupMode.onclick=()=>setAuthMode("signup");
 document.getElementById("accountBtn").onclick=()=>authModal.classList.add("show");
 document.getElementById("authClose").onclick=()=>authModal.classList.remove("show");
 
@@ -68,6 +72,45 @@ document.getElementById("emailLogin").onclick=async()=>{
     authMsg("Email verified. You are now logged in.");
   }catch(e){authMsg(e.message||"Email login failed.",true);}
 };
+
+
+const profileModal=document.getElementById("profileModal");
+const profileForm=document.getElementById("profileForm");
+const checkoutForm=document.getElementById("orderForm");
+const savedCustomerBox=document.getElementById("savedCustomerBox");
+const profileKey=user=>`shopezone-profile-${user.uid}`;
+function getProfile(user){try{return JSON.parse(localStorage.getItem(profileKey(user))||"null")}catch(e){return null}}
+function openProfile(user){
+  if(!user)return;
+  const p=getProfile(user);
+  document.getElementById("profileName").value=p?.name||"";
+  document.getElementById("profilePhone").value=p?.phone||user.phoneNumber||"";
+  document.getElementById("profileBilling").value=p?.billingCode||`SZ-${user.uid.slice(-8).toUpperCase()}`;
+  document.getElementById("profileAddress").value=p?.address||"";
+  profileModal.classList.add("show");
+}
+function saveProfile(user,data){localStorage.setItem(profileKey(user),JSON.stringify(data))}
+function fillCheckout(user){
+  const p=getProfile(user);
+  if(!p)return false;
+  checkoutForm.name.value=p.name;
+  checkoutForm.phone.value=p.phone;
+  checkoutForm.address.value=p.address;
+  savedCustomerBox.innerHTML=`<strong>✓ Saved Customer Details</strong><span>👤 ${p.name}</span><span>📱 ${p.phone}</span><span>🧾 Billing Code: ${p.billingCode}</span><span>📍 ${p.address}</span><button type="button" class="profile-edit" id="editProfile">Edit details</button>`;
+  savedCustomerBox.hidden=false;
+  checkoutForm.name.hidden=true; checkoutForm.phone.hidden=true; checkoutForm.address.hidden=true;
+  document.getElementById("editProfile").onclick=()=>openProfile(user);
+  return true;
+}
+profileForm.addEventListener("submit",e=>{
+  e.preventDefault();
+  const user=auth.currentUser;if(!user)return;
+  const data={name:document.getElementById("profileName").value.trim(),phone:document.getElementById("profilePhone").value.trim(),billingCode:document.getElementById("profileBilling").value.trim()||`SZ-${user.uid.slice(-8).toUpperCase()}`,address:document.getElementById("profileAddress").value.trim()};
+  if(!data.name||!data.phone||!data.address)return;
+  saveProfile(user,data); profileModal.classList.remove("show");
+  fillCheckout(user);
+});
+document.getElementById("closeProfile").onclick=()=>profileModal.classList.remove("show");
 
 document.getElementById("logoutBtn").onclick=()=>signOut(auth);
 onAuthStateChanged(auth,user=>{
@@ -173,9 +216,13 @@ document.getElementById("viewAll").onclick=()=>renderProducts(products);
 const modal=document.getElementById("checkoutModal");
 document.getElementById("checkoutBtn").onclick=()=>{
   if(!cart.length){alert("Your cart is empty.");return}
+  const user=auth.currentUser;
+  if(!user){alert("Please Login / Sign Up first. Your saved customer details will then be used automatically.");document.getElementById("authModal").classList.add("show");return}
+  if(!getProfile(user)){openProfile(user);return}
   modal.classList.add("show");
+  fillCheckout(user);
 };
-document.getElementById("closeModal").onclick=()=>modal.classList.remove("show");
+document.getElementById("closeModal").onclick=()=>{modal.classList.remove("show");};
 document.getElementById("orderForm").addEventListener("submit",e=>{
   e.preventDefault();
   document.getElementById("orderForm").hidden=true;
