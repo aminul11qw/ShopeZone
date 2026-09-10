@@ -1,3 +1,91 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBgugRnMKEOcXLsR2mrJgWbHPapYzUq4c4",
+  authDomain: "shopezone-4c666.firebaseapp.com",
+  projectId: "shopezone-4c666",
+  storageBucket: "shopezone-4c666.firebasestorage.app",
+  messagingSenderId: "1049798447788",
+  appId: "1:1049798447788:web:f6499203d62ea8df728509"
+};
+
+const auth = getAuth(initializeApp(firebaseConfig));
+let confirmationResult = null;
+let recaptchaVerifier = null;
+const authModal=document.getElementById("authModal");
+const authMessage=document.getElementById("authMessage");
+function authMsg(text,error=false){authMessage.hidden=false;authMessage.textContent=text;authMessage.classList.toggle("error",error)}
+
+document.getElementById("accountBtn").onclick=()=>authModal.classList.add("show");
+document.getElementById("authClose").onclick=()=>authModal.classList.remove("show");
+
+document.querySelectorAll(".auth-tab").forEach(tab=>tab.addEventListener("click",()=>{
+  document.querySelectorAll(".auth-tab").forEach(x=>x.classList.remove("active"));
+  tab.classList.add("active");
+  const phone=tab.dataset.auth==="phone";
+  document.getElementById("phoneAuth").hidden=!phone;
+  document.getElementById("emailAuth").hidden=phone;
+  authMessage.hidden=true;
+}));
+
+document.getElementById("sendOtp").onclick=async()=>{
+  const phone=document.getElementById("phoneNumber").value.trim();
+  if(!/^\+\d{8,15}$/.test(phone)){authMsg("Use international format, e.g. +8801712345678.",true);return;}
+  try{
+    if(!recaptchaVerifier){recaptchaVerifier=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"});}
+    confirmationResult=await signInWithPhoneNumber(auth,phone,recaptchaVerifier);
+    document.getElementById("otpArea").hidden=false;
+    authMsg("Verification code sent by SMS.");
+  }catch(e){
+    console.error(e); authMsg(e.message||"Could not send the verification code.",true);
+    if(recaptchaVerifier){try{recaptchaVerifier.clear()}catch(_){}} recaptchaVerifier=null;
+  }
+};
+
+document.getElementById("verifyOtp").onclick=async()=>{
+  const code=document.getElementById("otpCode").value.trim();
+  if(!confirmationResult){authMsg("Please request a verification code first.",true);return;}
+  if(!/^\d{6}$/.test(code)){authMsg("Enter the 6-digit verification code.",true);return;}
+  try{await confirmationResult.confirm(code);authMsg("Phone verified. You are now logged in.");}
+  catch(e){authMsg("Invalid or expired verification code.",true);}
+};
+
+document.getElementById("emailRegister").onclick=async()=>{
+  const email=document.getElementById("emailAddress").value.trim();
+  const password=document.getElementById("emailPassword").value;
+  if(!email||password.length<6){authMsg("Enter an email and a password of at least 6 characters.",true);return;}
+  try{const cred=await createUserWithEmailAndPassword(auth,email,password);await sendEmailVerification(cred.user);authMsg("Account created. Check your email and click the verification link.");}
+  catch(e){authMsg(e.message||"Could not create the account.",true);}
+};
+
+document.getElementById("emailLogin").onclick=async()=>{
+  const email=document.getElementById("emailAddress").value.trim();
+  const password=document.getElementById("emailPassword").value;
+  try{
+    const cred=await signInWithEmailAndPassword(auth,email,password);
+    if(!cred.user.emailVerified){await sendEmailVerification(cred.user);authMsg("Please verify your email first. A new verification link was sent.");return;}
+    authMsg("Email verified. You are now logged in.");
+  }catch(e){authMsg(e.message||"Email login failed.",true);}
+};
+
+document.getElementById("logoutBtn").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,user=>{
+  const panel=document.getElementById("userPanel");
+  panel.hidden=!user;
+  if(user){
+    document.getElementById("userName").textContent=user.displayName||"ShopeZone Customer";
+    document.getElementById("userEmail").textContent=user.email||user.phoneNumber||"";
+    document.querySelector(".auth-tabs").hidden=true;
+    document.getElementById("phoneAuth").hidden=true;
+    document.getElementById("emailAuth").hidden=true;
+  }else{
+    document.querySelector(".auth-tabs").hidden=false;
+    document.getElementById("phoneAuth").hidden=false;
+    document.getElementById("emailAuth").hidden=true;
+  }
+});
+
 const products = [
  {id:1,name:"Smart Watch",cat:"Electronics",price:59.99,old:89.99,rating:4.8,badge:"Hot",img:"https://images.unsplash.com/photo-1544117519-31a4b719223d?auto=format&fit=crop&w=700&q=80"},
  {id:2,name:"Wireless Headphones",cat:"Electronics",price:49.99,old:79.99,rating:4.7,badge:"New",img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80"},
@@ -22,12 +110,7 @@ const empty = document.getElementById("emptyState");
 const cartDrawer = document.getElementById("cartDrawer");
 const overlay = document.getElementById("overlay");
 
-function money(n){
-  const digits="০১২৩৪৫৬৭৮৯";
-  const num=Number(n).toFixed(2);
-  const bn=num.replace(/[0-9]/g,d=>digits[d]);
-  return "৳"+bn;
-}
+function money(n){return "$"+Number(n).toFixed(2)}
 function renderProducts(list=currentProducts){
   currentProducts=list;
   grid.innerHTML=list.map(p=>`
@@ -48,12 +131,12 @@ function updateCounts(){
   document.getElementById("wishCount").textContent=wishlist.length;
   document.getElementById("subtotal").textContent=money(cart.reduce((a,x)=>a+x.price*x.qty,0));
 }
-function addToCart(id){
+window.addToCart = function addToCart(id){
   const p=products.find(x=>x.id===id), item=cart.find(x=>x.id===id);
   if(item)item.qty++; else cart.push({...p,qty:1});
   save(); renderCart(); openCart();
 }
-function changeQty(id,delta){
+window.changeQty = function changeQty(id,delta){
   const item=cart.find(x=>x.id===id); if(!item)return;
   item.qty+=delta; if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
   save(); renderCart();
